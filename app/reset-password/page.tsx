@@ -19,8 +19,8 @@ export default function ResetPasswordPage() {
     e.preventDefault()
     if (!canSubmit) return
     setLoading(true); setError('')
-    const { error: e } = await supabase.auth.updateUser({ password: pw })
-    if (e) {
+    const { error: updateError } = await supabase.auth.updateUser({ password: pw })
+    if (updateError) {
       setError('Une erreur est survenue. Recommencez depuis le mail de récupération.')
       setLoading(false)
     } else {
