@@ -102,7 +102,7 @@ export default function SignalementsClient({
               key={s}
               onClick={() => setStatut(s)}
               style={{
-                padding: '8px 14px', borderRadius: 8, border: 'none', cursor: 'pointer',
+                padding: '8px 14px', borderRadius: 8, cursor: 'pointer',
                 fontSize: 13, fontWeight: statut === s ? 600 : 500, fontFamily: 'inherit',
                 background: statut === s ? '#0058bc' : 'white',
                 color: statut === s ? 'white' : '#414755',
