@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase'
+import { createUser } from './actions'
 
 type Profile = {
   id: string
@@ -31,6 +32,37 @@ export default function UtilisateursClient({
   const [profiles, setProfiles] = useState<Profile[]>(initial)
   const [toggling, setToggling] = useState<string | null>(null)
   const [search, setSearch]     = useState('')
+  const [modal, setModal]       = useState(false)
+  const [saving, setSaving]     = useState(false)
+  const [formError, setFormError] = useState('')
+  const [form, setForm] = useState({ prenom: '', nom: '', email: '', password: '', role: 'user' as 'user' | 'admin' })
+
+  const resetForm = () => setForm({ prenom: '', nom: '', email: '', password: '', role: 'user' })
+
+  const handleCreate = async () => {
+    if (!form.email || !form.password || !form.prenom || !form.nom) {
+      setFormError('Tous les champs sont requis.'); return
+    }
+    if (form.password.length < 8) {
+      setFormError('Le mot de passe doit faire au moins 8 caractères.'); return
+    }
+    setSaving(true); setFormError('')
+    const result = await createUser(form)
+    if (result.error) {
+      setFormError(result.error); setSaving(false); return
+    }
+    // Ajoute le nouveau profil à la liste locale
+    if (result.user) {
+      setProfiles(prev => [...prev, {
+        id: result.user!.id,
+        prenom: form.prenom,
+        nom: form.nom,
+        email: form.email,
+        role: form.role,
+      }])
+    }
+    setSaving(false); setModal(false); resetForm()
+  }
 
   const filtered = profiles.filter(p => {
     if (!search) return true
@@ -68,6 +100,20 @@ export default function UtilisateursClient({
             {profiles.length} compte{profiles.length !== 1 ? 's' : ''} · {admins} admin{admins !== 1 ? 's' : ''} · {users} utilisateur{users !== 1 ? 's' : ''}
           </p>
         </div>
+        <button
+          onClick={() => { resetForm(); setFormError(''); setModal(true) }}
+          style={{
+            display: 'flex', alignItems: 'center', gap: 8,
+            padding: '10px 18px', borderRadius: 10,
+            background: '#0058bc', color: 'white',
+            border: 'none', cursor: 'pointer',
+            fontSize: 14, fontWeight: 600, fontFamily: 'inherit',
+            boxShadow: '0 4px 12px -2px rgba(0,88,188,0.35)',
+          }}
+        >
+          <span style={{ fontSize: 18 }}>+</span>
+          Nouvel utilisateur
+        </button>
       </div>
 
       {/* Recherche */}
@@ -202,8 +248,100 @@ export default function UtilisateursClient({
       </div>
 
       <p style={{ marginTop: 12, fontSize: 12, color: '#aaa' }}>
-        Les comptes sont créés lors de la première connexion. Vous ne pouvez pas modifier votre propre rôle.
+        Vous ne pouvez pas modifier votre propre rôle.
       </p>
+
+      {/* Modal création */}
+      {modal && (
+        <div
+          onClick={() => setModal(false)}
+          style={{
+            position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50,
+          }}
+        >
+          <div
+            onClick={e => e.stopPropagation()}
+            style={{
+              background: 'white', borderRadius: 16, padding: 32,
+              width: '100%', maxWidth: 440,
+              boxShadow: '0 20px 60px rgba(0,0,0,0.15)',
+            }}
+          >
+            <h2 style={{ margin: '0 0 24px', fontSize: 18, fontWeight: 700, color: '#191c1e' }}>
+              Nouvel utilisateur
+            </h2>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 14 }}>
+              {[['Prénom', 'prenom', 'Jean'], ['Nom', 'nom', 'Dupont']].map(([label, key, placeholder]) => (
+                <div key={key}>
+                  <label style={{ fontSize: 12, fontWeight: 600, color: '#717786', textTransform: 'uppercase', letterSpacing: '0.4px', display: 'block', marginBottom: 6 }}>{label}</label>
+                  <input
+                    value={(form as any)[key]}
+                    onChange={e => setForm(f => ({ ...f, [key]: e.target.value }))}
+                    placeholder={placeholder}
+                    style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #c1c6d7', fontSize: 14, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box', color: '#191c1e', background: 'white' }}
+                    onFocus={e => (e.target.style.borderColor = '#0058bc')}
+                    onBlur={e => (e.target.style.borderColor = '#c1c6d7')}
+                  />
+                </div>
+              ))}
+            </div>
+
+            {[['Email', 'email', 'email', 'utilisateur@exemple.fr'], ['Mot de passe', 'password', 'password', '8 caractères minimum']].map(([label, key, type, placeholder]) => (
+              <div key={key} style={{ marginBottom: 14 }}>
+                <label style={{ fontSize: 12, fontWeight: 600, color: '#717786', textTransform: 'uppercase', letterSpacing: '0.4px', display: 'block', marginBottom: 6 }}>{label}</label>
+                <input
+                  type={type}
+                  value={(form as any)[key]}
+                  onChange={e => setForm(f => ({ ...f, [key]: e.target.value }))}
+                  placeholder={placeholder}
+                  style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #c1c6d7', fontSize: 14, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box', color: '#191c1e', background: 'white' }}
+                  onFocus={e => (e.target.style.borderColor = '#0058bc')}
+                  onBlur={e => (e.target.style.borderColor = '#c1c6d7')}
+                />
+              </div>
+            ))}
+
+            <div style={{ marginBottom: 20 }}>
+              <label style={{ fontSize: 12, fontWeight: 600, color: '#717786', textTransform: 'uppercase', letterSpacing: '0.4px', display: 'block', marginBottom: 6 }}>Rôle</label>
+              <div style={{ display: 'flex', gap: 8 }}>
+                {(['user', 'admin'] as const).map(r => (
+                  <button
+                    key={r}
+                    onClick={() => setForm(f => ({ ...f, role: r }))}
+                    style={{
+                      flex: 1, padding: '10px', borderRadius: 8, cursor: 'pointer', fontFamily: 'inherit',
+                      fontSize: 14, fontWeight: 600,
+                      background: form.role === r ? '#0058bc' : 'white',
+                      color: form.role === r ? 'white' : '#414755',
+                      border: form.role === r ? 'none' : '1px solid #c1c6d7',
+                    }}
+                  >{r === 'admin' ? 'Admin' : 'Utilisateur'}</button>
+                ))}
+              </div>
+            </div>
+
+            {formError && (
+              <div style={{ padding: '8px 12px', borderRadius: 8, background: '#ffdad6', color: '#ba1a1a', fontSize: 13, marginBottom: 16 }}>
+                {formError}
+              </div>
+            )}
+
+            <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
+              <button
+                onClick={() => setModal(false)}
+                style={{ padding: '10px 20px', borderRadius: 8, border: '1px solid #c1c6d7', background: 'white', color: '#414755', fontSize: 14, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}
+              >Annuler</button>
+              <button
+                onClick={handleCreate}
+                disabled={saving}
+                style={{ padding: '10px 20px', borderRadius: 8, border: 'none', background: '#0058bc', color: 'white', fontSize: 14, fontWeight: 600, cursor: saving ? 'not-allowed' : 'pointer', fontFamily: 'inherit', opacity: saving ? 0.7 : 1 }}
+              >{saving ? 'Création…' : 'Créer le compte'}</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
