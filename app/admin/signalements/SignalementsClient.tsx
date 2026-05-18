@@ -87,7 +87,7 @@ export default function SignalementsClient({
             placeholder="Référence, titre, auteur…"
             style={{
               border: 'none', outline: 'none', fontSize: 14,
-              fontFamily: 'inherit', background: 'transparent', width: '100%', color: '#191c1e',
+              fontFamily: 'inherit', background: 'white', width: '100%', color: '#191c1e',
             }}
           />
           {search && (
@@ -121,7 +121,7 @@ export default function SignalementsClient({
           onChange={e => setTypeId(e.target.value)}
           style={{
             padding: '8px 12px', borderRadius: 8, border: '1px solid rgba(193,198,215,0.5)',
-            background: 'white', fontSize: 14, fontFamily: 'inherit', color: '#414755',
+            background: 'white', fontSize: 14, fontFamily: 'inherit', color: '#191c1e',
             cursor: 'pointer', outline: 'none',
           }}
         >

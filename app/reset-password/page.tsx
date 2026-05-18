@@ -78,6 +78,7 @@ export default function ResetPasswordPage() {
                   width: '100%', padding: '12px 14px', borderRadius: 10,
                   border: '1px solid #c1c6d7', fontSize: 15, outline: 'none',
                   fontFamily: 'inherit', boxSizing: 'border-box',
+                  color: '#191c1e', background: 'white',
                 }}
                 onFocus={e => (e.target.style.borderColor = '#0058bc')}
                 onBlur={e => (e.target.style.borderColor = '#c1c6d7')}
@@ -97,6 +98,7 @@ export default function ResetPasswordPage() {
                   width: '100%', padding: '12px 14px', borderRadius: 10,
                   border: `1px solid ${pw2 && pw !== pw2 ? '#ba1a1a' : '#c1c6d7'}`, fontSize: 15, outline: 'none',
                   fontFamily: 'inherit', boxSizing: 'border-box',
+                  color: '#191c1e', background: 'white',
                 }}
                 onFocus={e => (e.target.style.borderColor = '#0058bc')}
                 onBlur={e => (e.target.style.borderColor = pw2 && pw !== pw2 ? '#ba1a1a' : '#c1c6d7')}

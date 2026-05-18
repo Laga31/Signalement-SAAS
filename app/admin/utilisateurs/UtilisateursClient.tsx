@@ -84,7 +84,7 @@ export default function UtilisateursClient({
           placeholder="Nom, prénom, email…"
           style={{
             border: 'none', outline: 'none', fontSize: 14,
-            fontFamily: 'inherit', background: 'transparent', width: '100%', color: '#191c1e',
+            fontFamily: 'inherit', background: 'white', width: '100%', color: '#191c1e',
           }}
         />
         {search && (

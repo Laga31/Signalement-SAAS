@@ -187,6 +187,7 @@ export default function TypesClient({ initialTypes }: { initialTypes: TypeRow[] 
                   width: '100%', padding: '10px 12px', borderRadius: 8,
                   border: '1px solid #c1c6d7', fontSize: 14, fontFamily: 'inherit',
                   outline: 'none', boxSizing: 'border-box',
+                  color: '#191c1e', background: 'white',
                 }}
                 onFocus={e => (e.target.style.borderColor = '#0058bc')}
                 onBlur={e => (e.target.style.borderColor = '#c1c6d7')}
