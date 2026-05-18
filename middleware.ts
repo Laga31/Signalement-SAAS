@@ -23,25 +23,35 @@ export async function middleware(request: NextRequest) {
 
   const { data: { user } } = await supabase.auth.getUser()
 
-  // Redirige vers /login si non connecté et accès à /admin
-  if (!user && request.nextUrl.pathname.startsWith('/admin')) {
-    return NextResponse.redirect(new URL('/login', request.url))
+  const isAdmin = request.nextUrl.pathname.startsWith('/admin')
+  const isPortail = request.nextUrl.pathname.startsWith('/portail')
+  const isPortailLogin = request.nextUrl.pathname === '/portail/login'
+  const isAdminLogin = request.nextUrl.pathname === '/login'
+
+  // Non connecté → redirige vers login approprié
+  if (!user) {
+    if (isAdmin) return NextResponse.redirect(new URL('/login', request.url))
+    if (isPortail && !isPortailLogin) return NextResponse.redirect(new URL('/portail/login', request.url))
+    return supabaseResponse
   }
 
-  // Redirige vers /portail/login si non connecté et accès à /portail (sauf /portail/login)
-  if (!user && request.nextUrl.pathname.startsWith('/portail') && !request.nextUrl.pathname.startsWith('/portail/login')) {
-    return NextResponse.redirect(new URL('/portail/login', request.url))
+  // Connecté → vérifie le rôle pour /admin
+  if (isAdmin) {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single()
+
+    if (profile?.role !== 'admin') {
+      // Utilisateur non-admin : redirige vers le portail
+      return NextResponse.redirect(new URL('/portail', request.url))
+    }
   }
 
-  // Redirige vers /admin si déjà connecté et accès à /login
-  if (user && request.nextUrl.pathname === '/login') {
-    return NextResponse.redirect(new URL('/admin', request.url))
-  }
-
-  // Redirige vers /portail si déjà connecté et accès à /portail/login
-  if (user && request.nextUrl.pathname === '/portail/login') {
-    return NextResponse.redirect(new URL('/portail', request.url))
-  }
+  // Déjà connecté sur les pages de login → redirige vers la bonne app
+  if (isAdminLogin) return NextResponse.redirect(new URL('/admin', request.url))
+  if (isPortailLogin) return NextResponse.redirect(new URL('/portail', request.url))
 
   return supabaseResponse
 }
