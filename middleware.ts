@@ -28,14 +28,24 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/login', request.url))
   }
 
+  // Redirige vers /portail/login si non connecté et accès à /portail (sauf /portail/login)
+  if (!user && request.nextUrl.pathname.startsWith('/portail') && !request.nextUrl.pathname.startsWith('/portail/login')) {
+    return NextResponse.redirect(new URL('/portail/login', request.url))
+  }
+
   // Redirige vers /admin si déjà connecté et accès à /login
   if (user && request.nextUrl.pathname === '/login') {
     return NextResponse.redirect(new URL('/admin', request.url))
+  }
+
+  // Redirige vers /portail si déjà connecté et accès à /portail/login
+  if (user && request.nextUrl.pathname === '/portail/login') {
+    return NextResponse.redirect(new URL('/portail', request.url))
   }
 
   return supabaseResponse
 }
 
 export const config = {
-  matcher: ['/admin/:path*', '/login'],
+  matcher: ['/admin/:path*', '/login', '/portail/:path*'],
 }
