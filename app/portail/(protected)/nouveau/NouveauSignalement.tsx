@@ -4,6 +4,19 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase'
 
+// Affiche l'icône : emoji si c'est un emoji, initiale du label sinon
+function TypeIcon({ icon, label, color }: { icon: string; label: string; color: string }) {
+  const isEmoji = /\p{Emoji_Presentation}|\p{Extended_Pictographic}/u.test(icon)
+  if (isEmoji) {
+    return <span style={{ fontSize: 24 }}>{icon}</span>
+  }
+  return (
+    <span style={{ fontSize: 18, fontWeight: 700, color }}>
+      {label?.[0]?.toUpperCase() ?? '?'}
+    </span>
+  )
+}
+
 type TypeOption = {
   id: string
   label: string
@@ -214,7 +227,7 @@ export default function NouveauSignalement({ types, userId }: Props) {
                         justifyContent: 'center',
                         fontSize: 24,
                       }}>
-                        {t.icon}
+                        <TypeIcon icon={t.icon} label={t.label} color={t.color} />
                       </div>
                       <span style={{
                         fontSize: 13,
@@ -276,7 +289,7 @@ export default function NouveauSignalement({ types, userId }: Props) {
               border: `1.5px solid ${selectedType?.color ?? '#0058bc'}30`,
               marginBottom: 20,
             }}>
-              <span style={{ fontSize: 18 }}>{selectedType?.icon}</span>
+              {selectedType && <TypeIcon icon={selectedType.icon} label={selectedType.label} color={selectedType.color} />}
               <span style={{ fontSize: 13, fontWeight: 600, color: selectedType?.color ?? '#0058bc' }}>
                 {selectedType?.label}
               </span>
@@ -388,7 +401,7 @@ export default function NouveauSignalement({ types, userId }: Props) {
                   justifyContent: 'center',
                   fontSize: 22,
                 }}>
-                  {selectedType?.icon}
+                  {selectedType && <TypeIcon icon={selectedType.icon} label={selectedType.label} color={selectedType.color} />}
                 </div>
                 <div>
                   <div style={{ fontWeight: 700, fontSize: 16, color: '#111827' }}>{selectedType?.label}</div>
