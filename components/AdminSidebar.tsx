@@ -17,7 +17,7 @@ export default function AdminSidebar({ user }: { user: { email: string, prenom?:
 
   const handleLogout = async () => {
     await supabase.auth.signOut()
-    router.push('/login')
+    window.location.href = '/login'
   }
 
   const initiales = `${user.prenom?.[0] ?? ''}${user.nom?.[0] ?? ''}`.toUpperCase() || user.email[0].toUpperCase()

@@ -1,30 +1,6 @@
 import { createClient } from '@/lib/supabase-server'
 import { redirect } from 'next/navigation'
-
-async function LogoutButton() {
-  return (
-    <form action="/api/portail/logout" method="post">
-      <button
-        type="submit"
-        style={{
-          padding: '7px 16px',
-          background: 'rgba(255,255,255,0.15)',
-          color: 'white',
-          border: '1px solid rgba(255,255,255,0.25)',
-          borderRadius: 8,
-          fontSize: 13,
-          fontWeight: 500,
-          cursor: 'pointer',
-          fontFamily: 'Inter, system-ui, sans-serif',
-          backdropFilter: 'blur(4px)',
-          transition: 'background 0.15s',
-        }}
-      >
-        Déconnexion
-      </button>
-    </form>
-  )
-}
+import LogoutButton from '@/components/LogoutButton'
 
 export default async function PortailLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient()
@@ -139,7 +115,7 @@ export default async function PortailLayout({ children }: { children: React.Reac
                 {prenom}
               </span>
             </div>
-            <LogoutButton />
+            <LogoutButton redirectTo="/portail/login" />
           </div>
         </div>
       </nav>
