@@ -138,6 +138,15 @@ export default function PortailLoginPage() {
     }
   }
 
+  const traduireErreur = (msg: string): string => {
+    if (msg.toLowerCase().includes('rate limit')) return 'Trop de tentatives. Veuillez patienter quelques minutes avant de réessayer.'
+    if (msg.toLowerCase().includes('already registered') || msg.toLowerCase().includes('already exists')) return 'Cette adresse email est déjà utilisée.'
+    if (msg.toLowerCase().includes('invalid email')) return 'Adresse email invalide.'
+    if (msg.toLowerCase().includes('weak password')) return 'Mot de passe trop faible. Ajoutez des chiffres ou des caractères spéciaux.'
+    if (msg.toLowerCase().includes('network')) return 'Erreur réseau. Vérifiez votre connexion.'
+    return 'Une erreur est survenue. Veuillez réessayer.'
+  }
+
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
@@ -156,7 +165,7 @@ export default function PortailLoginPage() {
       options: { data: { prenom, nom } },
     })
     if (error) {
-      setError(error.message)
+      setError(traduireErreur(error.message))
       setLoading(false)
     } else {
       router.push('/portail')
