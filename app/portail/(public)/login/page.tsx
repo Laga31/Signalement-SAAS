@@ -134,7 +134,8 @@ export default function PortailLoginPage() {
       setError('Email ou mot de passe incorrect.')
       setLoading(false)
     } else {
-      router.push('/portail')
+      // Redirige vers / qui gère la redirection selon le rôle (admin → /admin, user → /portail)
+      window.location.href = '/'
     }
   }
 
@@ -168,7 +169,7 @@ export default function PortailLoginPage() {
       setError(traduireErreur(error.message))
       setLoading(false)
     } else {
-      router.push('/portail')
+      window.location.href = '/'
     }
   }
 
